@@ -23,6 +23,10 @@ app.use(cookieParser());
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/task", taskRouter);
 
+app.get("/", (req,res)=>{
+  res.send(" Server is Working")
+})
+
 //Error Handler
 app.use(errorHandler);
 export default app;
