@@ -1,17 +1,19 @@
-import { ErrorHandler } from "../middlewares/error.js";
-import Task from "../models/todo.js";
+import { ErrorHandler } from '../middlewares/error.js';
+import Task from '../models/todo.js';
 
 const newTask = async (req, res, next) => {
-  const { title, description } = req.body;
-  const newTask = await Task.create({
+  const { title, description, author } = req.body;
+  const task = await Task.create({
     title,
     description,
     user: req.user._id,
+    author: author || req.user.name
   });
 
   res.status(201).json({
-    success: "true",
-    message: "Task Created",
+    success: 'true',
+    message: 'Task Created',
+    task
   });
 };
 
@@ -22,38 +24,42 @@ const getTasks = async (req, res, next) => {
     title: 1,
     description: 1,
     isCompleted: 1,
-    _id: 0,
+    _id: 1,
+    author:1
   });
   res.status(200).json({
-    success: "true",
-    tasks,
+    success: 'true',
+    tasks
   });
 };
 
 const updateTask = async (req, res, next) => {
+  const { title, description } = req.body;
   const _id = req.params.id;
   const task = await Task.findById(_id);
   if (!task) {
-    return next(new ErrorHandler("Invalid Task Id", 404));
+    return next(new ErrorHandler('Invalid Task Id', 404));
   }
-  task.isCompleted = !task.isCompleted;
+  task.title = title;
+  task.description = description;
   await task.save();
   res.status(200).json({
-    success: "true",
-    message: "User is updated",
+    success: 'true',
+    message: 'User is updated',
+    task
   });
 };
 
 const deleteTask = async (req, res, next) => {
   const _id = req.params.id;
-  const task = await Task.findById(_id);
+  const task = await Task.findByIdAndDelete(_id);
   if (!task) {
-    return next(new ErrorHandler("Invalid Task Id", 404));
+    return next(new ErrorHandler('Invalid Task Id', 404));
   }
   await task.deleteOne();
   res.status(200).json({
-    success: "true",
-    message: "Task Deleted",
+    success: 'true',
+    message: 'Task Deleted'
   });
 };
 export { newTask, getTasks, updateTask, deleteTask };

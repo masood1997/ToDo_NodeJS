@@ -13,7 +13,7 @@ const app = express();
 // Middlewares
 app.use(express.json());
 app.use(cors({
-  origin: [process.env.FRONTEND_URI],
+  origin: process.env.FRONTEND_URI,
   methods: ["GET","POST","PUT","DELETE"],
   credentials:true
 }))

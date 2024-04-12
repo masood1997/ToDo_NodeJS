@@ -15,9 +15,9 @@ const todoSchema = new mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     required:true
   },
-  isCompleted: {
-    type: Boolean,
-    default: false,
+  author: {
+    type: String,
+    default:"none"
   },
   createdAt: {
     type: Date,
