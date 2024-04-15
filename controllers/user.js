@@ -20,7 +20,7 @@ const getMyProfile = (req, res, next) => {
   res.status(200).json({
     success: 'true',
     message: {
-      user:req.user
+      user: req.user
     }
   });
 };
@@ -35,7 +35,7 @@ const login = async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(new ErrorHandler('Invalid email or Password', 401));
 
-    setCookie(res, user, 200, 'Logged In');
+    setCookie(req, res, user, 200);
   } catch (error) {
     next(error);
   }
@@ -56,7 +56,7 @@ const register = async (req, res, next) => {
       password: hashedPassword
     });
 
-    setCookie(res, newUser, 201, 'Registered Successfully');
+    setCookie(req, res, newUser, 201);
   } catch (error) {
     next(error);
   }
@@ -65,14 +65,25 @@ const register = async (req, res, next) => {
 const logOut = async (req, res, next) => {
   const { token } = req.cookies;
   if (!token) return next(new ErrorHandler('Need to be loggedin for Logout', 200));
+
+  // Is refreshToken in DB?
   const user = await User.findOne({ refresh_token: token });
-  if (!user) return next(new ErrorHandler('Need to be loggedin for Logout', 200));
-  user.refresh_token = null;
+  if (!user) {
+    res.clearCookie('token', {
+      httpOnly: true,
+      sameSite: process.env.MODE === 'DEVELOPMENT' ? 'Lax' : 'None',
+      secure: process.env.MODE === 'DEVELOPMENT' ? false : true
+    });
+    return next(new ErrorHandler('Need to be loggedin for Logout', 200));
+  }
+
+  // Delete refreshToken in DB
+  const newRefreshTokenArray = user.refresh_token.filter((rt) => rt !== token);
+  user.refresh_token = newRefreshTokenArray;
   await user.save();
   res
     .status(200)
     .clearCookie('token', {
-      //use expires and not expire as it will create a token with null value also keep in mind to use the format new Date as Date.now wont work
       httpOnly: true,
       sameSite: process.env.MODE === 'DEVELOPMENT' ? 'Lax' : 'None',
       secure: process.env.MODE === 'DEVELOPMENT' ? false : true
