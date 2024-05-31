@@ -26,6 +26,14 @@ app.use(cookieParser());
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/task', taskRouter);
 
+app.get('/api/v1/info', (req,res)=>{
+res.status(200).json({
+  success:"true",
+  message:"About",
+  info:" This backend server stores and sends blog posts. It is created by Masood Rehman"
+})
+})
+
 app.get('/', (req, res) => {
   res.send(' Server is Working');
 });

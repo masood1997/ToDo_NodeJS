@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 const setCookie = async (req, res, user, statusCode) => {
   const access_token = jwt.sign({ _id: user._id }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: '30s'
+    expiresIn: '600s'
   });
   const newRefreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: '1d'

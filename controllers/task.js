@@ -62,4 +62,24 @@ const deleteTask = async (req, res, next) => {
     message: 'Task Deleted'
   });
 };
-export { newTask, getTasks, updateTask, deleteTask };
+
+const singleTask = async (req,res,next)=>{
+  try {
+    const _id = req.params.id;
+ const task = await Task.findById(_id);
+ if (!task) {
+  return next(new ErrorHandler('Invalid Task Id', 404));
+}
+res.status(200).json({
+  success: 'true',
+  message: 'Task Found',
+  task:task
+});
+  } catch (error) {
+    console.log(error);
+  }
+ 
+
+};
+
+export { newTask, getTasks, updateTask, deleteTask, singleTask };

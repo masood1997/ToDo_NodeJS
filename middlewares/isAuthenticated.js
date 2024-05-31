@@ -16,7 +16,6 @@ const isAuthenticated = async (req, res, next) => {
     if (error.name === 'TokenExpiredError') next(new ErrorHandler('Token Expired', 401));
   }
 };
-
 export const issueAccessToken = async (req, res, next) => {
   try {
     const { token } = req.cookies;
